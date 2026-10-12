@@ -22,6 +22,17 @@ VITE_SUPABASE_ANON_KEY=...
 
 in a `.env` file locally, or as repository variables for the GitHub Pages deploy.
 
+## AI tutor
+
+Every step has an "Ask tutor" button. It calls the `tutor` Supabase Edge Function (`supabase/functions/tutor`), which keeps the Anthropic API key on the server, coaches with hints instead of answers, and caps each learner at 30 messages a day.
+
+```bash
+supabase secrets set ANTHROPIC_API_KEY=...
+supabase functions deploy tutor
+```
+
+Set a monthly spend limit in the Anthropic Console. Until Supabase is connected the button shows that the tutor is off.
+
 ## Writing lessons
 
 All content lives in `src/content/courses.ts`. A lesson is a list of steps:

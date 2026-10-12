@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Step } from '../content/types'
 import { VisualView } from './VisualView'
+import { Tutor } from './Tutor'
 
 type Status = 'idle' | 'correct' | 'wrong' | 'revealed'
 
@@ -20,6 +21,7 @@ export function StepView({ step, onContinue }: { step: Step; onContinue: () => v
           {step.title && <h2>{step.title}</h2>}
           <p className="prose">{step.body}</p>
           {step.visual && <VisualView visual={step.visual} />}
+          <Tutor step={{ prompt: step.body }} answer="" />
         </div>
         <footer className="check-bar">
           <button className="btn primary" onClick={onContinue} autoFocus>
@@ -124,6 +126,11 @@ export function StepView({ step, onContinue }: { step: Step; onContinue: () => v
             {step.unit && <span className="unit">{step.unit}</span>}
           </form>
         )}
+
+        <Tutor
+          step={{ prompt: step.prompt, explanation: step.explanation, options: step.type === 'choice' ? step.options : undefined }}
+          answer={step.type === 'choice' ? (choice === null ? '' : step.options[choice]) : step.type === 'number' ? text : String(slider)}
+        />
       </div>
 
       <footer className={`check-bar ${status}`}>
