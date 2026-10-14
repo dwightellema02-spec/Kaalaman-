@@ -4,11 +4,11 @@ import { useAuth } from '../auth'
 
 export function CoursePage() {
   const course = findCourse(useParams().courseId ?? '')
-  const { user, progress } = useAuth()
+  const { user, progress, isAdmin } = useAuth()
   if (!course) return <p>Course not found. <Link to="/">Back to courses</Link></p>
 
-  // Like Brilliant, a lesson opens once the one before it is finished.
-  const unlocked = (i: number) => i === 0 || progress.completed.includes(course.lessons[i - 1].id)
+  // Like Brilliant, a lesson opens once the one before it is finished. Admins can open any.
+  const unlocked = (i: number) => isAdmin || i === 0 || progress.completed.includes(course.lessons[i - 1].id)
 
   return (
     <section className="course">
