@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { liveStreak, useAuth } from '../auth'
 
 export function Header() {
-  const { user, progress, signOut } = useAuth()
+  const { user, progress, isAdmin, signOut } = useAuth()
   return (
     <header className="site-header">
       <Link to="/" className="logo">
@@ -14,6 +14,7 @@ export function Header() {
           <>
             <span className="stat" title="Day streak">🔥 {liveStreak(progress)}</span>
             <span className="stat" title="Experience points">⚡ {progress.xp}</span>
+            {isAdmin && <span className="admin-badge">Admin</span>}
             <span className="who">{user.name}</span>
             <button className="btn ghost small" onClick={signOut}>Sign out</button>
           </>

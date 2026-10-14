@@ -54,6 +54,9 @@ async function hash(text: string) {
 }
 
 // ---- Shared ----
+// Admins can open every lesson. Stored as SHA-256 of the email so addresses stay out of the public code.
+const ADMIN_EMAIL_HASHES = ['0aa9f1e8f450a184d2124203caee2a35aa8005cd62e7c2b61f1241b68101182b']
+
 const today = () => new Date().toLocaleDateString('en-CA') // YYYY-MM-DD in local time
 const yesterday = () => new Date(Date.now() - 86400000).toLocaleDateString('en-CA')
 
@@ -75,6 +78,7 @@ type AuthValue = {
   user: User | null
   progress: Progress
   ready: boolean
+  isAdmin: boolean
   signUp: (name: string, email: string, password: string) => Promise<string | null>
   signIn: (email: string, password: string) => Promise<string | null>
   signOut: () => Promise<void>
@@ -87,9 +91,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [progress, setProgress] = useState<Progress>(emptyProgress)
   const [ready, setReady] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   async function load(u: User | null) {
     setUser(u)
+    setIsAdmin(!!u && ADMIN_EMAIL_HASHES.includes(await hash(u.email)))
     if (!u) setProgress(emptyProgress)
     else if (supabase) {
       const { data } = await supabase.from('progress').select('data').eq('user_id', u.id).maybeSingle()
@@ -115,6 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     progress,
     ready,
+    isAdmin,
     async signUp(name, email, password) {
       email = email.trim().toLowerCase()
       if (supabase) {
