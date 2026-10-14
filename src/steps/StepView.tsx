@@ -13,6 +13,7 @@ export function StepView({ step, onContinue }: { step: Step; onContinue: () => v
   const [status, setStatus] = useState<Status>('idle')
   const [attempts, setAttempts] = useState(0)
   const locked = status === 'correct' || status === 'revealed'
+  const typed = Number(text.trim().replace('−', '-')) // phones may type a Unicode minus
 
   if (step.type === 'explain') {
     return (
@@ -33,12 +34,12 @@ export function StepView({ step, onContinue }: { step: Step; onContinue: () => v
   }
 
   const canCheck =
-    step.type === 'choice' ? choice !== null : step.type === 'number' ? text.trim() !== '' && !isNaN(Number(text)) : true
+    step.type === 'choice' ? choice !== null : step.type === 'number' ? text.trim() !== '' && !isNaN(typed) : true
 
   function check() {
     let ok = false
     if (step.type === 'choice') ok = choice === step.answer
-    if (step.type === 'number') ok = Math.abs(Number(text) - step.answer) <= (step.tolerance ?? 1e-9)
+    if (step.type === 'number') ok = Math.abs(typed - step.answer) <= (step.tolerance ?? 1e-9)
     if (step.type === 'slider') ok = slider === step.answer
     setStatus(ok ? 'correct' : 'wrong')
     if (!ok) setAttempts((n) => n + 1)
